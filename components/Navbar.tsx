@@ -36,7 +36,7 @@ const Navbar: React.FC<NavbarProps> = ({
 
   return (
     <nav className="sticky top-0 z-50 w-full bg-white border-b border-gray-200 shadow-sm">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-[90%] mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16 gap-4">
           {/* Left: Logo */}
           <div className="flex items-center cursor-pointer flex-shrink-0" onClick={() => onNavigate('/')}>
@@ -50,7 +50,7 @@ const Navbar: React.FC<NavbarProps> = ({
 
           {/* Center: Search Bar (Conditional) */}
           {showSearch && onSearch && (
-            <div className="hidden md:flex flex-1 items-center justify-center max-w-xl mx-4">
+            <div className="hidden md:flex flex-1 items-start justify-center max-w-xl mx-4 mt-3">
                <form onSubmit={handleSearchSubmit} className="w-full relative">
                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                     <Search className="h-4 w-4 text-gray-400" />

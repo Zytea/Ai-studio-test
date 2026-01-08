@@ -234,7 +234,7 @@ const SearchPage: React.FC<SearchPageProps> = ({ initialQuery, posts, onPostClic
   );
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="max-w-[90%] mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="flex flex-col lg:flex-row gap-8">
         
         {/* Desktop Sidebar */}
@@ -306,7 +306,7 @@ const SearchPage: React.FC<SearchPageProps> = ({ initialQuery, posts, onPostClic
 
           {/* Grid */}
           {filteredPosts.length > 0 ? (
-            <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 xl:grid-cols-2 2xl:grid-cols-3 gap-6">
               {filteredPosts.map(post => (
                 <div key={post.id} className="h-full">
                   <JobCard post={post} onClick={onPostClick} />

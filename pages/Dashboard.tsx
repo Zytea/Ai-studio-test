@@ -140,7 +140,7 @@ const Dashboard: React.FC<DashboardProps> = ({ user, userPosts, userApplications
     }
 
     return (
-      <div className="max-w-6xl mx-auto px-4 py-8">
+      <div className="max-w-[90%] mx-auto px-4 py-8">
         <button onClick={() => setManagingPostId(null)} className="flex items-center text-gray-500 hover:text-indigo-600 mb-6">
           <X size={18} className="mr-1" /> Back to Dashboard
         </button>
@@ -246,7 +246,7 @@ const Dashboard: React.FC<DashboardProps> = ({ user, userPosts, userApplications
 
   // Initial Views
   return (
-    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="max-w-[90%] mx-auto px-4 sm:px-6 lg:px-8 py-8">
       {/* Profile Header */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8 mb-8 flex flex-col md:flex-row items-center md:items-start gap-6">
         <img 

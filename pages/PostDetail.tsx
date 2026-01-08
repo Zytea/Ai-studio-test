@@ -28,7 +28,7 @@ const PostDetail: React.FC<PostDetailProps> = ({ post, currentUser, onBack, onAp
   const isOwner = currentUser?.id === post.professorId;
 
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="max-w-[85%] mx-auto px-4 sm:px-6 lg:px-8 py-8">
       
       {/* Back Nav */}
       <button onClick={onBack} className="flex items-center text-gray-500 hover:text-indigo-600 mb-6 transition-colors">
