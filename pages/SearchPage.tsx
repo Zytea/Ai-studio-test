@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { FilterState, JobPost, JobStatus } from '../types';
+import { FilterState, JobPost, JobStatus, School, SortOption } from '../types';
 import JobCard from '../components/JobCard';
-import { Filter, X, ChevronDown } from 'lucide-react';
-import { AVAILABLE_SKILLS, AVAILABLE_TOPICS } from '../services/mockData';
+import { Filter, X, ChevronDown, Check } from 'lucide-react';
+import { AVAILABLE_TOPICS, AVAILABLE_SKILLS } from '../services/mockData';
 
 interface SearchPageProps {
   initialQuery: string;
@@ -10,13 +10,20 @@ interface SearchPageProps {
   onPostClick: (id: string) => void;
 }
 
+const SCHOOLS: School[] = ['SDS', 'SSE', 'SME', 'LHS', 'HSS', 'MED', 'AI'];
+
 const SearchPage: React.FC<SearchPageProps> = ({ initialQuery, posts, onPostClick }) => {
   const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
+  const [showAllTopics, setShowAllTopics] = useState(false);
+  const [showAllSkills, setShowAllSkills] = useState(false);
+  
   const [filters, setFilters] = useState<FilterState>({
     query: initialQuery,
-    status: [JobStatus.OPEN, JobStatus.COMPETITIVE], // Default active
+    status: [JobStatus.OPEN, JobStatus.COMPETITIVE], // Default: Open & Competitive
+    schools: [],
     topics: [],
-    skills: []
+    skills: [],
+    sortBy: 'RELEVANT'
   });
 
   // Reset query if prop changes
@@ -34,6 +41,16 @@ const SearchPage: React.FC<SearchPageProps> = ({ initialQuery, posts, onPostClic
     });
   };
 
+  const toggleSchool = (school: School) => {
+    setFilters(prev => {
+      const exists = prev.schools.includes(school);
+      return {
+        ...prev,
+        schools: exists ? prev.schools.filter(s => s !== school) : [...prev.schools, school]
+      };
+    });
+  };
+
   const toggleTopic = (topic: string) => {
     setFilters(prev => {
       const exists = prev.topics.includes(topic);
@@ -44,8 +61,18 @@ const SearchPage: React.FC<SearchPageProps> = ({ initialQuery, posts, onPostClic
     });
   };
 
+  const toggleSkill = (skill: string) => {
+    setFilters(prev => {
+      const exists = prev.skills.includes(skill);
+      return {
+        ...prev,
+        skills: exists ? prev.skills.filter(s => s !== skill) : [...prev.skills, skill]
+      };
+    });
+  };
+
   const filteredPosts = useMemo(() => {
-    return posts.filter(post => {
+    let result = posts.filter(post => {
       // 1. Text Search
       const q = filters.query.toLowerCase();
       const matchesQuery = 
@@ -60,14 +87,43 @@ const SearchPage: React.FC<SearchPageProps> = ({ initialQuery, posts, onPostClic
         return false;
       }
 
-      // 3. Topic Filter
+      // 3. School Filter
+      if (filters.schools.length > 0 && !filters.schools.includes(post.school)) {
+        return false;
+      }
+      
+      // 4. Topic Filter (OR logic within topics, can be changed to AND)
       if (filters.topics.length > 0) {
         const hasTopic = post.topicTags.some(t => filters.topics.includes(t));
         if (!hasTopic) return false;
       }
 
+       // 5. Skill Filter
+       if (filters.skills.length > 0) {
+        const hasSkill = post.skillTags.some(t => filters.skills.includes(t));
+        if (!hasSkill) return false;
+      }
+
       return true;
     });
+
+    // Sort
+    result.sort((a, b) => {
+        if (filters.sortBy === 'NEWEST') {
+            return new Date(b.postedDate).getTime() - new Date(a.postedDate).getTime();
+        } else if (filters.sortBy === 'POPULAR') {
+            return b.viewCount - a.viewCount;
+        } else {
+             // Relevant: Simple implementation favoring open status then date
+             // Real implementation would use full text search score
+             if (a.status !== b.status) {
+                 return a.status === JobStatus.OPEN ? -1 : 1;
+             }
+             return 0;
+        }
+    });
+
+    return result;
   }, [posts, filters]);
 
   const FilterSidebar = () => (
@@ -76,41 +132,102 @@ const SearchPage: React.FC<SearchPageProps> = ({ initialQuery, posts, onPostClic
       <div>
         <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wider mb-3">Status</h3>
         <div className="space-y-2">
-          {[JobStatus.OPEN, JobStatus.COMPETITIVE, JobStatus.CLOSED, JobStatus.ENDED].map(status => (
+          {[JobStatus.OPEN, JobStatus.COMPETITIVE, JobStatus.CLOSED].map(status => (
             <label key={status} className="flex items-center gap-3 cursor-pointer group">
               <input 
                 type="checkbox" 
                 checked={filters.status.includes(status)}
                 onChange={() => toggleStatus(status)}
-                className="w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
+                className="w-4 h-4 text-indigo-600 rounded border-gray-300 focus:ring-indigo-500"
               />
               <span className={`text-sm ${filters.status.includes(status) ? 'text-gray-900 font-medium' : 'text-gray-600 group-hover:text-gray-900'}`}>
                 {status === JobStatus.OPEN ? 'Open (Hiring)' : 
-                 status === JobStatus.COMPETITIVE ? 'Competitive' : 
-                 status === JobStatus.CLOSED ? 'Closed' : 'Ended'}
+                 status === JobStatus.COMPETITIVE ? 'Competitive' : 'Closed'}
               </span>
             </label>
           ))}
         </div>
       </div>
 
+      {/* Schools */}
+      <div>
+        <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wider mb-3">Department / School</h3>
+        <div className="space-y-2">
+          {SCHOOLS.map(school => (
+            <label key={school} className="flex items-center gap-3 cursor-pointer group">
+              <input 
+                type="checkbox" 
+                checked={filters.schools.includes(school)}
+                onChange={() => toggleSchool(school)}
+                className="w-4 h-4 text-indigo-600 rounded border-gray-300 focus:ring-indigo-500"
+              />
+              <span className={`text-sm ${filters.schools.includes(school) ? 'text-gray-900 font-medium' : 'text-gray-600 group-hover:text-gray-900'}`}>
+                {school}
+              </span>
+            </label>
+          ))}
+        </div>
+      </div>
+      
       {/* Topics */}
       <div>
         <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wider mb-3">Research Topics</h3>
-        <div className="flex flex-wrap gap-2">
-          {AVAILABLE_TOPICS.map(topic => (
-            <button
-              key={topic}
-              onClick={() => toggleTopic(topic)}
-              className={`px-3 py-1 text-xs rounded-full border transition-all ${
-                filters.topics.includes(topic)
-                  ? 'bg-blue-600 text-white border-blue-600'
-                  : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'
-              }`}
-            >
-              {topic}
-            </button>
+        <div className="space-y-2">
+          {(showAllTopics ? AVAILABLE_TOPICS : AVAILABLE_TOPICS.slice(0, 5)).map(topic => (
+            <label key={topic} className="flex items-center gap-3 cursor-pointer group">
+              <div className={`w-4 h-4 rounded border flex items-center justify-center transition-colors ${filters.topics.includes(topic) ? 'bg-indigo-600 border-indigo-600' : 'border-gray-300 bg-white'}`}>
+                {filters.topics.includes(topic) && <Check size={10} className="text-white" />}
+              </div>
+              <input 
+                type="checkbox" 
+                checked={filters.topics.includes(topic)}
+                onChange={() => toggleTopic(topic)}
+                className="hidden" // Custom checkbox styling
+              />
+              <span className={`text-sm ${filters.topics.includes(topic) ? 'text-gray-900 font-medium' : 'text-gray-600 group-hover:text-gray-900'}`}>
+                {topic}
+              </span>
+            </label>
           ))}
+          {AVAILABLE_TOPICS.length > 5 && (
+            <button 
+                onClick={() => setShowAllTopics(!showAllTopics)}
+                className="text-sm text-indigo-600 hover:text-indigo-800 font-medium mt-1"
+            >
+                {showAllTopics ? '- Show Less' : '+ Show More'}
+            </button>
+          )}
+        </div>
+      </div>
+
+       {/* Skills */}
+       <div>
+        <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wider mb-3">Skills</h3>
+        <div className="space-y-2">
+          {(showAllSkills ? AVAILABLE_SKILLS : AVAILABLE_SKILLS.slice(0, 5)).map(skill => (
+            <label key={skill} className="flex items-center gap-3 cursor-pointer group">
+               <div className={`w-4 h-4 rounded border flex items-center justify-center transition-colors ${filters.skills.includes(skill) ? 'bg-indigo-600 border-indigo-600' : 'border-gray-300 bg-white'}`}>
+                {filters.skills.includes(skill) && <Check size={10} className="text-white" />}
+              </div>
+              <input 
+                type="checkbox" 
+                checked={filters.skills.includes(skill)}
+                onChange={() => toggleSkill(skill)}
+                className="hidden"
+              />
+              <span className={`text-sm ${filters.skills.includes(skill) ? 'text-gray-900 font-medium' : 'text-gray-600 group-hover:text-gray-900'}`}>
+                {skill}
+              </span>
+            </label>
+          ))}
+           {AVAILABLE_SKILLS.length > 5 && (
+            <button 
+                onClick={() => setShowAllSkills(!showAllSkills)}
+                className="text-sm text-indigo-600 hover:text-indigo-800 font-medium mt-1"
+            >
+                {showAllSkills ? '- Show Less' : '+ Show More'}
+            </button>
+          )}
         </div>
       </div>
     </div>
@@ -139,7 +256,7 @@ const SearchPage: React.FC<SearchPageProps> = ({ initialQuery, posts, onPostClic
           </button>
         </div>
 
-        {/* Mobile Offcanvas (Modal) */}
+        {/* Mobile Offcanvas */}
         {isMobileFilterOpen && (
           <div className="fixed inset-0 z-50 flex justify-end">
             <div className="fixed inset-0 bg-black/25 backdrop-blur-sm transition-opacity" onClick={() => setIsMobileFilterOpen(false)}></div>
@@ -154,7 +271,7 @@ const SearchPage: React.FC<SearchPageProps> = ({ initialQuery, posts, onPostClic
               <div className="mt-8 pt-6 border-t border-gray-100">
                 <button 
                   onClick={() => setIsMobileFilterOpen(false)}
-                  className="w-full py-3 bg-blue-600 text-white rounded-lg font-bold"
+                  className="w-full py-3 bg-indigo-600 text-white rounded-lg font-bold"
                 >
                   Show {filteredPosts.length} Results
                 </button>
@@ -168,13 +285,22 @@ const SearchPage: React.FC<SearchPageProps> = ({ initialQuery, posts, onPostClic
           {/* Toolbar */}
           <div className="hidden lg:flex justify-between items-center mb-6 pb-4 border-b border-gray-100">
             <h2 className="text-xl font-bold text-gray-900">
-              {filters.query ? `Results for "${filters.query}"` : 'Latest Opportunities'}
+              {filters.query ? `Results for "${filters.query}"` : 'Job Feed'}
             </h2>
             <div className="flex items-center gap-2">
               <span className="text-sm text-gray-500">Sort by:</span>
-              <button className="flex items-center gap-1 text-sm font-medium text-gray-900 hover:text-blue-600">
-                Newest <ChevronDown size={14} />
-              </button>
+              <div className="relative group">
+                <select 
+                    value={filters.sortBy}
+                    onChange={(e) => setFilters(prev => ({ ...prev, sortBy: e.target.value as SortOption }))}
+                    className="appearance-none bg-transparent pl-2 pr-6 py-1 text-sm font-medium text-gray-900 hover:text-indigo-600 cursor-pointer focus:outline-none"
+                >
+                    <option value="RELEVANT">Most Relevant</option>
+                    <option value="NEWEST">Newest</option>
+                    <option value="POPULAR">Most Popular</option>
+                </select>
+                <ChevronDown size={14} className="absolute right-0 top-1.5 pointer-events-none text-gray-500" />
+              </div>
             </div>
           </div>
 
@@ -191,8 +317,8 @@ const SearchPage: React.FC<SearchPageProps> = ({ initialQuery, posts, onPostClic
             <div className="text-center py-20 bg-white rounded-lg border border-dashed border-gray-300">
               <p className="text-gray-500 text-lg">No positions match your filters.</p>
               <button 
-                onClick={() => setFilters({ query: '', status: [JobStatus.OPEN], topics: [], skills: [] })}
-                className="mt-4 text-blue-600 font-medium hover:underline"
+                onClick={() => setFilters({ query: '', status: [JobStatus.OPEN], schools: [], topics: [], skills: [], sortBy: 'RELEVANT' })}
+                className="mt-4 text-indigo-600 font-medium hover:underline"
               >
                 Clear all filters
               </button>

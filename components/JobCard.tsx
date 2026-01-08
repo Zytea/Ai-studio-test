@@ -1,6 +1,6 @@
 import React from 'react';
 import { JobPost, JobStatus } from '../types';
-import { Calendar, User, Briefcase } from 'lucide-react';
+import { User, Building2 } from 'lucide-react';
 
 interface JobCardProps {
   post: JobPost;
@@ -31,13 +31,12 @@ const JobCard: React.FC<JobCardProps> = ({ post, onClick }) => {
           text: 'text-red-800',
           label: 'Closed'
         };
-      case JobStatus.ENDED:
       default:
         return {
           bar: 'bg-gray-500',
           bg: 'bg-gray-100',
           text: 'text-gray-800',
-          label: 'Ended'
+          label: 'Closed'
         };
     }
   };
@@ -62,14 +61,14 @@ const JobCard: React.FC<JobCardProps> = ({ post, onClick }) => {
 
       <div className="p-5 flex flex-col flex-grow">
         {/* Title */}
-        <h3 className="text-lg font-bold text-gray-900 group-hover:text-blue-600 transition-colors mb-3 line-clamp-2">
+        <h3 className="text-lg font-bold text-gray-900 group-hover:text-indigo-600 transition-colors mb-3 line-clamp-2">
           {post.title}
         </h3>
 
         {/* Tags */}
         <div className="flex flex-wrap gap-2 mb-2">
           {post.topicTags.map(tag => (
-            <span key={tag} className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+            <span key={tag} className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-50 text-indigo-700 border border-indigo-100">
               {tag}
             </span>
           ))}
@@ -94,8 +93,8 @@ const JobCard: React.FC<JobCardProps> = ({ post, onClick }) => {
                 <span className="truncate max-w-[120px]">{post.professorName}</span>
             </div>
             <div className="flex items-center gap-1.5">
-                <Briefcase size={14} className="text-gray-400" />
-                <span className="truncate max-w-[120px]">{post.labName}</span>
+                <Building2 size={14} className="text-gray-400" />
+                <span className="truncate max-w-[100px]">{post.school}</span>
             </div>
         </div>
       </div>
