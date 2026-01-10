@@ -1,12 +1,54 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Search } from 'lucide-react';
 
 interface HomeProps {
   onSearch: (query: string) => void;
 }
 
+const PHRASES = ["Research Adventure", "Dream Lab", "Academic Mentor", "Next Career Step"];
+
 const Home: React.FC<HomeProps> = ({ onSearch }) => {
   const [query, setQuery] = useState('');
+  
+  // Typing animation state
+  const [text, setText] = useState('');
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [loopNum, setLoopNum] = useState(0);
+  const [typingSpeed, setTypingSpeed] = useState(150);
+
+  useEffect(() => {
+    const handleTyping = () => {
+      const i = loopNum % PHRASES.length;
+      const fullText = PHRASES[i];
+
+      setText(isDeleting 
+        ? fullText.substring(0, text.length - 1) 
+        : fullText.substring(0, text.length + 1)
+      );
+
+      // Adjust speed
+      if (isDeleting) {
+        setTypingSpeed(40); // Faster delete
+      } else {
+        setTypingSpeed(100); // Normal typing
+      }
+
+      // Handle pauses and switching
+      if (!isDeleting && text === fullText) {
+        // Finished typing phrase - Pause here with blinking cursor
+        setTypingSpeed(2000); 
+        setIsDeleting(true);
+      } else if (isDeleting && text === '') {
+        // Finished deleting phrase
+        setIsDeleting(false);
+        setLoopNum(loopNum + 1);
+        setTypingSpeed(500); // Pause before starting new
+      }
+    };
+
+    const timer = setTimeout(handleTyping, typingSpeed);
+    return () => clearTimeout(timer);
+  }, [text, isDeleting, loopNum, typingSpeed]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -15,11 +57,28 @@ const Home: React.FC<HomeProps> = ({ onSearch }) => {
 
   return (
     <div className="min-h-[calc(100vh-64px)] flex flex-col items-center justify-center bg-white px-4">
+      {/* Custom Keyframe for sharp blink */}
+      <style>{`
+        @keyframes blink {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0; }
+        }
+        .animate-cursor-blink {
+          animation: blink 1s step-end infinite;
+        }
+      `}</style>
+
       <div className="w-full max-w-2xl text-center -mt-20">
         {/* Hero Text */}
-        <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-6 tracking-tight">
-          Find your next <span className="text-blue-600">Research Adventure</span>
+        <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-10 tracking-tight flex flex-col items-center">
+          <span className="block">Find your next</span>
+          {/* Fixed height container to prevent layout shift */}
+          <span className="text-blue-600 mt-2 h-[1.3em] flex items-center justify-center">
+             {text}
+             <span className="w-[3px] h-[1em] bg-blue-600 ml-1 animate-cursor-blink"></span>
+          </span>
         </h1>
+        
         <p className="text-lg text-gray-500 mb-10 max-w-xl mx-auto">
           Connect with professors, discover cutting-edge labs, and launch your academic career.
         </p>

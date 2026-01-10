@@ -50,7 +50,7 @@ const Navbar: React.FC<NavbarProps> = ({
 
           {/* Center: Search Bar (Conditional) */}
           {showSearch && onSearch && (
-            <div className="hidden md:flex flex-1 items-start justify-center max-w-xl mx-4 mt-3">
+            <div className="flex flex-1 items-center justify-center max-w-xl mx-2 md:mx-4">
                <form onSubmit={handleSearchSubmit} className="w-full relative">
                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                     <Search className="h-4 w-4 text-gray-400" />
@@ -60,7 +60,7 @@ const Navbar: React.FC<NavbarProps> = ({
                   value={localQuery}
                   onChange={(e) => setLocalQuery(e.target.value)}
                   placeholder="Search topic, professor..."
-                  className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-full leading-5 bg-gray-50 placeholder-gray-500 focus:outline-none focus:bg-white focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 sm:text-sm transition-colors"
+                  className="block w-full pl-10 pr-3 py-2 translate-y-[5px] border border-gray-300 rounded-full leading-5 bg-gray-50 placeholder-transparent md:placeholder-gray-500 focus:outline-none focus:bg-white focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 sm:text-sm transition-colors"
                  />
                </form>
             </div>
