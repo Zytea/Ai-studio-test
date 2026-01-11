@@ -1,19 +1,32 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { User, JobPost, UserRole, Application, ApplicationStatus, JobStatus, School } from '../types';
 import JobCard from '../components/JobCard';
-import { Settings, Bookmark, FileText, Users, ExternalLink, X, AlertCircle, Eye, Edit2, Trash2 } from 'lucide-react';
+import { Settings, Bookmark, FileText, Users, ExternalLink, X, AlertCircle, Eye, Edit2, Trash2, Bold, Italic, List, Link as LinkIcon, Eye as PreviewIcon, PenLine, Heart } from 'lucide-react';
+import MarkdownRenderer from '../components/MarkdownRenderer';
 
 interface DashboardProps {
   user: User;
   userPosts: JobPost[];
   userApplications: Application[];
   allApplications: Application[]; // For professor to see applicants
+  savedPostIds: string[];
+  allPosts: JobPost[];
+  initialEditPostId: string | null;
   onPostClick: (id: string) => void;
 }
 
-const Dashboard: React.FC<DashboardProps> = ({ user, userPosts, userApplications, allApplications, onPostClick }) => {
+const Dashboard: React.FC<DashboardProps> = ({ 
+    user, 
+    userPosts, 
+    userApplications, 
+    allApplications, 
+    savedPostIds,
+    allPosts,
+    initialEditPostId,
+    onPostClick 
+}) => {
   // Default tab logic: Professor -> posts, Student -> applications
-  const [activeTab, setActiveTab] = useState<'posts' | 'applications' | 'settings'>(
+  const [activeTab, setActiveTab] = useState<'posts' | 'applications' | 'saved' | 'settings'>(
     user.role === UserRole.PROFESSOR ? 'posts' : 'applications'
   );
   
@@ -22,6 +35,9 @@ const Dashboard: React.FC<DashboardProps> = ({ user, userPosts, userApplications
   const [isEditingPost, setIsEditingPost] = useState(false);
   const [editingPostData, setEditingPostData] = useState<Partial<JobPost>>({});
   
+  // Editor State
+  const [editorMode, setEditorMode] = useState<'write' | 'preview'>('write');
+
   // Professor: Applications Table Logic
   const [showRejected, setShowRejected] = useState(false);
   const [rejectingAppId, setRejectingAppId] = useState<string | null>(null);
@@ -30,6 +46,18 @@ const Dashboard: React.FC<DashboardProps> = ({ user, userPosts, userApplications
 
   // Settings State
   const [showMyApplicationsTab, setShowMyApplicationsTab] = useState(user.preferences?.showMyApplications ?? (user.role === UserRole.STUDENT));
+
+  // Handle Initial Edit Redirect (if user clicked "Edit" on Detail page)
+  useEffect(() => {
+    if (initialEditPostId) {
+        const postToEdit = allPosts.find(p => p.id === initialEditPostId);
+        if (postToEdit) {
+            setEditingPostData(postToEdit);
+            setIsEditingPost(true);
+            setEditorMode('write');
+        }
+    }
+  }, [initialEditPostId, allPosts]);
 
   const handleStatusChange = (appId: string, newStatus: ApplicationStatus) => {
     if (newStatus === ApplicationStatus.REJECTED) {
@@ -64,6 +92,10 @@ const Dashboard: React.FC<DashboardProps> = ({ user, userPosts, userApplications
      });
   }, [userPosts]);
 
+  const savedPosts = useMemo(() => {
+      return allPosts.filter(p => savedPostIds.includes(p.id));
+  }, [allPosts, savedPostIds]);
+
   // Status Badge Helper
   const ApplicationStatusBadge = ({ status }: { status: ApplicationStatus }) => {
     const config = {
@@ -76,38 +108,134 @@ const Dashboard: React.FC<DashboardProps> = ({ user, userPosts, userApplications
     return <span className={`px-2 py-1 rounded text-xs font-bold uppercase ${config[status]}`}>{status}</span>;
   };
 
+  // Helper for inserting markdown text
+  const insertMarkdown = (prefix: string, suffix: string = '') => {
+      const textarea = document.getElementById('description-editor') as HTMLTextAreaElement;
+      if (!textarea) return;
+      
+      const start = textarea.selectionStart;
+      const end = textarea.selectionEnd;
+      const text = textarea.value;
+      
+      const before = text.substring(0, start);
+      const selection = text.substring(start, end);
+      const after = text.substring(end);
+      
+      const newText = before + prefix + selection + suffix + after;
+      setEditingPostData(prev => ({ ...prev, description: newText }));
+      
+      // Need to defer focus to next tick for React state update
+      setTimeout(() => {
+          textarea.focus();
+          textarea.setSelectionRange(start + prefix.length, end + prefix.length);
+      }, 0);
+  };
+
   // --- SUB-VIEWS ---
 
-  // 1. Post Editor (Mock)
+  // 1. Post Editor (With Live Preview)
   if (isEditingPost) {
     return (
-        <div className="max-w-4xl mx-auto px-4 py-8 animate-fade-in">
+        <div className="max-w-5xl mx-auto px-4 py-8 animate-fade-in">
             <button onClick={() => setIsEditingPost(false)} className="flex items-center text-gray-500 hover:text-indigo-600 mb-6 transition-colors">
                 <X size={18} className="mr-1" /> Cancel
             </button>
             <h2 className="text-2xl font-bold mb-6 animate-fade-in">{editingPostData.id ? 'Edit Position' : 'Create New Position'}</h2>
-            <div className="bg-white p-8 rounded-xl border border-gray-200 shadow-sm space-y-6 animate-fade-in" style={{animationDelay: '100ms'}}>
-                {/* Reusing Form Styles roughly */}
+            <div className="bg-white p-6 sm:p-8 rounded-xl border border-gray-200 shadow-sm space-y-6 animate-fade-in" style={{animationDelay: '100ms'}}>
+                
                 <div className="grid grid-cols-2 gap-6">
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">Research Topic (Title)</label>
-                        <input type="text" className="w-full border border-gray-300 rounded p-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition-shadow" defaultValue={editingPostData.title} />
+                        <input 
+                            type="text" 
+                            className="w-full border border-gray-300 rounded p-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition-shadow" 
+                            value={editingPostData.title || ''} 
+                            onChange={e => setEditingPostData({...editingPostData, title: e.target.value})}
+                        />
                     </div>
                      <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">Department</label>
-                        <select className="w-full border border-gray-300 rounded p-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition-shadow" defaultValue={editingPostData.school}>
+                        <select 
+                            className="w-full border border-gray-300 rounded p-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition-shadow" 
+                            value={editingPostData.school}
+                            onChange={e => setEditingPostData({...editingPostData, school: e.target.value as School})}
+                        >
                             <option>SDS</option><option>SSE</option><option>SME</option>
                         </select>
                     </div>
                 </div>
+
+                {/* Markdown Editor Area */}
                 <div>
-                     <label className="block text-sm font-medium text-gray-700 mb-1">Description (Markdown)</label>
-                     <textarea className="w-full border border-gray-300 rounded p-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition-shadow" rows={5} defaultValue={editingPostData.description}></textarea>
+                     <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                     <div className="border border-gray-300 rounded-lg overflow-hidden focus-within:ring-2 focus-within:ring-indigo-500 focus-within:border-indigo-500 transition-all">
+                        {/* Toolbar */}
+                        <div className="bg-gray-50 border-b border-gray-200 px-3 py-2 flex items-center justify-between">
+                            <div className="flex gap-1">
+                                <button type="button" onClick={() => insertMarkdown('**', '**')} className="p-1.5 hover:bg-gray-200 rounded text-gray-600" title="Bold">
+                                    <Bold size={16} />
+                                </button>
+                                <button type="button" onClick={() => insertMarkdown('*', '*')} className="p-1.5 hover:bg-gray-200 rounded text-gray-600" title="Italic">
+                                    <Italic size={16} />
+                                </button>
+                                <div className="w-px h-6 bg-gray-300 mx-1"></div>
+                                <button type="button" onClick={() => insertMarkdown('- ')} className="p-1.5 hover:bg-gray-200 rounded text-gray-600" title="List">
+                                    <List size={16} />
+                                </button>
+                                <button type="button" onClick={() => insertMarkdown('[', '](url)')} className="p-1.5 hover:bg-gray-200 rounded text-gray-600" title="Link">
+                                    <LinkIcon size={16} />
+                                </button>
+                            </div>
+                            <div className="flex bg-gray-200 rounded p-0.5">
+                                <button 
+                                    type="button"
+                                    onClick={() => setEditorMode('write')}
+                                    className={`px-3 py-1 rounded text-xs font-bold flex items-center gap-1.5 transition-colors ${editorMode === 'write' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+                                >
+                                    <PenLine size={12} /> Write
+                                </button>
+                                <button 
+                                    type="button"
+                                    onClick={() => setEditorMode('preview')}
+                                    className={`px-3 py-1 rounded text-xs font-bold flex items-center gap-1.5 transition-colors ${editorMode === 'preview' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+                                >
+                                    <PreviewIcon size={12} /> Preview
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Editor / Preview Area */}
+                        <div className="min-h-[300px] max-h-[500px] overflow-y-auto bg-white relative">
+                            {editorMode === 'write' ? (
+                                <textarea 
+                                    id="description-editor"
+                                    className="w-full h-full min-h-[300px] p-4 focus:outline-none resize-none font-mono text-sm" 
+                                    placeholder="Write in Markdown... # Header, **Bold**, - List"
+                                    value={editingPostData.description || ''}
+                                    onChange={e => setEditingPostData({...editingPostData, description: e.target.value})}
+                                ></textarea>
+                            ) : (
+                                <div className="p-4 bg-white h-full min-h-[300px]">
+                                    {editingPostData.description ? (
+                                        <MarkdownRenderer content={editingPostData.description} />
+                                    ) : (
+                                        <p className="text-gray-400 italic text-sm text-center mt-10">Nothing to preview</p>
+                                    )}
+                                </div>
+                            )}
+                        </div>
+                     </div>
+                     <p className="text-xs text-gray-500 mt-1.5 text-right">Markdown Supported</p>
                 </div>
+
                  <div className="grid grid-cols-3 gap-6">
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
-                        <select className="w-full border border-gray-300 rounded p-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition-shadow" defaultValue={editingPostData.status}>
+                        <select 
+                            className="w-full border border-gray-300 rounded p-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition-shadow" 
+                            value={editingPostData.status}
+                            onChange={e => setEditingPostData({...editingPostData, status: e.target.value as JobStatus})}
+                        >
                              <option value={JobStatus.OPEN}>Open</option>
                              <option value={JobStatus.COMPETITIVE}>Competitive</option>
                              <option value={JobStatus.CLOSED}>Closed</option>
@@ -115,11 +243,21 @@ const Dashboard: React.FC<DashboardProps> = ({ user, userPosts, userApplications
                     </div>
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">Headcount</label>
-                        <input type="number" className="w-full border border-gray-300 rounded p-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition-shadow" defaultValue={editingPostData.headcount} />
+                        <input 
+                            type="number" 
+                            className="w-full border border-gray-300 rounded p-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition-shadow" 
+                            value={editingPostData.headcount || 1} 
+                            onChange={e => setEditingPostData({...editingPostData, headcount: parseInt(e.target.value)})}
+                        />
                     </div>
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">Subsidy</label>
-                        <input type="text" className="w-full border border-gray-300 rounded p-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition-shadow" defaultValue={editingPostData.subsidy} />
+                        <input 
+                            type="text" 
+                            className="w-full border border-gray-300 rounded p-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition-shadow" 
+                            value={editingPostData.subsidy || ''} 
+                            onChange={e => setEditingPostData({...editingPostData, subsidy: e.target.value})}
+                        />
                     </div>
                 </div>
                 <div className="pt-4 flex justify-end">
@@ -295,6 +433,16 @@ const Dashboard: React.FC<DashboardProps> = ({ user, userPosts, userApplications
                 <Bookmark size={18} /> {user.role === UserRole.PROFESSOR ? 'My Applications' : 'My Applications'}
               </button>
           )}
+          
+          {/* Saved Positions Tab */}
+          <button 
+            onClick={() => setActiveTab('saved')}
+            className={`w-full flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 ${
+              activeTab === 'saved' ? 'bg-indigo-50 text-indigo-700 shadow-sm' : 'text-gray-600 hover:bg-gray-50'
+            }`}
+          >
+            <Heart size={18} /> Saved Positions
+          </button>
 
           <button 
             onClick={() => setActiveTab('settings')}
@@ -315,7 +463,7 @@ const Dashboard: React.FC<DashboardProps> = ({ user, userPosts, userApplications
                 <div className="flex justify-between items-center">
                   <h2 className="text-xl font-bold">My Posted Positions</h2>
                   <button 
-                    onClick={() => { setEditingPostData({}); setIsEditingPost(true); }}
+                    onClick={() => { setEditingPostData({}); setIsEditingPost(true); setEditorMode('write'); }}
                     className="px-4 py-2 bg-indigo-600 text-white rounded-md text-sm font-bold hover:bg-indigo-700 transition-transform active:scale-95"
                   >
                     Create New Post
@@ -365,7 +513,7 @@ const Dashboard: React.FC<DashboardProps> = ({ user, userPosts, userApplications
 
                            <div className="flex flex-row md:flex-col gap-2 justify-center border-t md:border-t-0 md:border-l border-gray-100 pt-4 md:pt-0 md:pl-4 min-w-[160px]">
                               <button 
-                                onClick={() => { setEditingPostData(post); setIsEditingPost(true); }}
+                                onClick={() => { setEditingPostData(post); setIsEditingPost(true); setEditorMode('write'); }}
                                 className="flex-1 px-3 py-1.5 text-sm bg-white border border-gray-300 text-gray-700 rounded hover:bg-gray-50 flex items-center justify-center gap-2 transition-colors"
                               >
                                 <Edit2 size={14} /> Edit
@@ -402,7 +550,7 @@ const Dashboard: React.FC<DashboardProps> = ({ user, userPosts, userApplications
                 {userApplications.length > 0 ? (
                   <div className="space-y-4">
                     {userApplications.map((app, index) => {
-                      const post = userPosts.find(p => p.id === app.postId); // Note: In real app, need access to all posts or fetch
+                      const post = userPosts.find(p => p.id === app.postId) || allPosts.find(p => p.id === app.postId);
                       // Assuming userPosts passed here contains relevant posts, otherwise fallback
                       return (
                         <div 
@@ -413,7 +561,6 @@ const Dashboard: React.FC<DashboardProps> = ({ user, userPosts, userApplications
                         >
                            <div className="flex justify-between items-start mb-2">
                              <h3 className="text-lg font-bold text-gray-900 group-hover:text-indigo-600 transition-colors">
-                                 {/* Mock title lookup if not in userPosts */}
                                  {post?.title || `Position #${app.postId}`} 
                              </h3>
                              <ApplicationStatusBadge status={app.status} />
@@ -435,6 +582,26 @@ const Dashboard: React.FC<DashboardProps> = ({ user, userPosts, userApplications
                   <div className="text-center py-12 bg-gray-50 rounded-lg border-2 border-dashed border-gray-200 animate-fade-in">
                     <p className="text-gray-500">No applications yet.</p>
                   </div>
+                )}
+             </div>
+          )}
+          
+          {/* SAVED POSITIONS */}
+          {activeTab === 'saved' && (
+             <div className="space-y-6 animate-fade-in">
+                <h2 className="text-xl font-bold">Saved Positions</h2>
+                {savedPosts.length > 0 ? (
+                    <div className="grid grid-cols-1 gap-6">
+                        {savedPosts.map((post, index) => (
+                           <div key={post.id} className="animate-fade-in" style={{ animationDelay: `${index * 50}ms` }}>
+                             <JobCard post={post} onClick={onPostClick} />
+                           </div>
+                        ))}
+                    </div>
+                ) : (
+                   <div className="text-center py-12 bg-gray-50 rounded-lg border-2 border-dashed border-gray-200 animate-fade-in">
+                    <p className="text-gray-500">You haven't saved any positions yet.</p>
+                  </div> 
                 )}
              </div>
           )}

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Navbar from './components/Navbar';
 import Home from './pages/Home';
 import SearchPage from './pages/SearchPage';
@@ -14,16 +14,31 @@ type Page = 'HOME' | 'SEARCH' | 'DETAIL' | 'DASHBOARD';
 const App: React.FC = () => {
   const [currentPage, setCurrentPage] = useState<Page>('HOME');
   const [currentUser, setCurrentUser] = useState<User | null>(null);
+  
+  // App Data State (simulating DB)
+  const [applications, setApplications] = useState<Application[]>(MOCK_APPLICATIONS);
+  
+  // Simulated Global Saved Posts State (persisted per session)
+  const [savedPostIds, setSavedPostIds] = useState<string[]>([]);
+  
+  // Navigation & Data passing
   const [currentPostId, setCurrentPostId] = useState<string | null>(null);
+  const [dashboardEditId, setDashboardEditId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   
   // Modal States
   const [showLogin, setShowLogin] = useState(false);
   const [showRegister, setShowRegister] = useState(false);
   const [showForgotPass, setShowForgotPass] = useState(false);
-  
-  // App Data State (simulating DB)
-  const [applications, setApplications] = useState<Application[]>(MOCK_APPLICATIONS);
+
+  // Sync Saved Posts when User logs in
+  useEffect(() => {
+    if (currentUser && currentUser.savedPostIds) {
+      setSavedPostIds(currentUser.savedPostIds);
+    } else {
+      setSavedPostIds([]);
+    }
+  }, [currentUser]);
 
   // Navigation Handler
   const navigateTo = (page: Page) => {
@@ -58,8 +73,26 @@ const App: React.FC = () => {
     alert('Application Submitted Successfully!');
   };
 
+  const handleToggleSave = (postId: string) => {
+    if (!currentUser) {
+        setShowLogin(true);
+        return;
+    }
+    setSavedPostIds(prev => 
+        prev.includes(postId) 
+        ? prev.filter(id => id !== postId) 
+        : [...prev, postId]
+    );
+  };
+
+  const handleEditRedirect = (postId: string) => {
+      setDashboardEditId(postId);
+      navigateTo('DASHBOARD');
+  };
+
   const handleLogout = () => {
     setCurrentUser(null);
+    setSavedPostIds([]);
     navigateTo('HOME');
   };
 
@@ -236,6 +269,9 @@ const App: React.FC = () => {
               currentUser={currentUser}
               onBack={() => navigateTo('SEARCH')}
               onApply={handleApply}
+              isSaved={savedPostIds.includes(currentPostId)}
+              onToggleSave={() => handleToggleSave(currentPostId)}
+              onEdit={() => handleEditRedirect(currentPostId)}
             />
           )}
 
@@ -245,6 +281,9 @@ const App: React.FC = () => {
               userPosts={currentUser.role === UserRole.PROFESSOR ? MOCK_POSTS.filter(p => p.professorId === currentUser.id) : []}
               userApplications={currentUser.role === UserRole.STUDENT ? applications.filter(a => a.studentId === currentUser.id) : []}
               allApplications={applications}
+              savedPostIds={savedPostIds}
+              allPosts={MOCK_POSTS}
+              initialEditPostId={dashboardEditId}
               onPostClick={handlePostClick}
             />
           )}

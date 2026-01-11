@@ -1,18 +1,31 @@
 import React, { useState } from 'react';
 import { JobPost, User, UserRole, JobStatus } from '../types';
-import { ArrowLeft, Clock, CheckCircle2, Heart, Share2, Wallet, Users, AlertCircle, Edit2 } from 'lucide-react';
+import { ArrowLeft, Clock, CheckCircle2, Heart, Share2, Wallet, Users, AlertCircle, Edit2, Link as LinkIcon, Check } from 'lucide-react';
+import MarkdownRenderer from '../components/MarkdownRenderer';
 
 interface PostDetailProps {
   post: JobPost;
   currentUser: User | null;
   onBack: () => void;
   onApply: (postId: string, resumeLink: string, statement: string) => void;
+  isSaved?: boolean;
+  onToggleSave?: () => void;
+  onEdit?: () => void;
 }
 
-const PostDetail: React.FC<PostDetailProps> = ({ post, currentUser, onBack, onApply }) => {
+const PostDetail: React.FC<PostDetailProps> = ({ 
+    post, 
+    currentUser, 
+    onBack, 
+    onApply,
+    isSaved = false,
+    onToggleSave,
+    onEdit
+}) => {
   const [isApplyModalOpen, setApplyModalOpen] = useState(false);
   const [resumeLink, setResumeLink] = useState('');
   const [statement, setStatement] = useState('');
+  const [isCopied, setIsCopied] = useState(false);
 
   // Status badge config
   const statusColor = 
@@ -23,6 +36,15 @@ const PostDetail: React.FC<PostDetailProps> = ({ post, currentUser, onBack, onAp
     e.preventDefault();
     onApply(post.id, resumeLink, statement);
     setApplyModalOpen(false);
+  };
+
+  const handleShare = () => {
+    // In a real app, this would be the actual URL
+    const url = `${window.location.origin}/post/${post.id}`;
+    navigator.clipboard.writeText(url).then(() => {
+        setIsCopied(true);
+        setTimeout(() => setIsCopied(false), 2000);
+    });
   };
 
   const isOwner = currentUser?.id === post.professorId;
@@ -92,7 +114,7 @@ const PostDetail: React.FC<PostDetailProps> = ({ post, currentUser, onBack, onAp
               ))}
             </div>
             
-            <div className="p-4 bg-indigo-50 text-indigo-900 rounded-lg text-sm border border-indigo-100">
+            <div className="p-4 bg-indigo-50 text-indigo-900 rounded-lg text-sm border border-indigo-100 font-medium">
               {post.requirements}
             </div>
           </div>
@@ -100,8 +122,8 @@ const PostDetail: React.FC<PostDetailProps> = ({ post, currentUser, onBack, onAp
           {/* Description Block */}
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 sm:p-8">
             <h3 className="text-lg font-bold text-gray-900 mb-4 border-b pb-2">Project Description</h3>
-            <div className="prose prose-indigo max-w-none text-gray-700">
-              <p className="whitespace-pre-line leading-relaxed">{post.description}</p>
+            <div className="min-h-[100px]">
+              <MarkdownRenderer content={post.description} />
             </div>
           </div>
 
@@ -126,7 +148,7 @@ const PostDetail: React.FC<PostDetailProps> = ({ post, currentUser, onBack, onAp
                <div className="space-y-3">
                  {isOwner ? (
                     <button 
-                        onClick={() => alert('Redirect to Dashboard Edit Mode')}
+                        onClick={onEdit}
                         className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-indigo-600 text-white rounded-lg font-bold hover:bg-indigo-700 transition-all shadow-sm active:scale-95"
                     >
                         <Edit2 size={18} /> Edit Post
@@ -141,14 +163,24 @@ const PostDetail: React.FC<PostDetailProps> = ({ post, currentUser, onBack, onAp
                     </button>
                  )}
                  
-                 <button className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-white text-gray-700 border border-gray-300 rounded-lg font-bold hover:bg-gray-50 transition-colors">
-                    <Heart size={18} className="text-gray-400" />
-                    Save Position
+                 <button 
+                    onClick={onToggleSave}
+                    className={`w-full flex items-center justify-center gap-2 px-4 py-3 border rounded-lg font-bold transition-colors ${
+                        isSaved 
+                        ? 'bg-pink-50 text-pink-600 border-pink-200 hover:bg-pink-100' 
+                        : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                    }`}
+                 >
+                    <Heart size={18} className={isSaved ? "fill-current" : "text-gray-400"} />
+                    {isSaved ? 'Saved' : 'Save Position'}
                   </button>
 
-                 <button className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-white text-gray-500 rounded-lg text-sm hover:text-gray-900 transition-colors">
-                   <Share2 size={16} />
-                   Share
+                 <button 
+                    onClick={handleShare}
+                    className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-white text-gray-500 rounded-lg text-sm hover:text-gray-900 transition-colors"
+                 >
+                   {isCopied ? <Check size={16} className="text-green-600" /> : <Share2 size={16} />}
+                   {isCopied ? 'Link Copied' : 'Share'}
                  </button>
                </div>
             </div>

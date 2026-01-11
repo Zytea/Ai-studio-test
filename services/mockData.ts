@@ -1,3 +1,4 @@
+
 import { JobPost, JobStatus, User, UserRole, Application, ApplicationStatus } from '../types';
 
 export const MOCK_USER_PROFESSOR: User = {
@@ -9,6 +10,7 @@ export const MOCK_USER_PROFESSOR: User = {
   email: 'alanturing@cuhk.edu.cn',
   bio: 'Focusing on AI, Logic, and Computability at School of Data Science.',
   avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Alan',
+  savedPostIds: ['2'], // Mock saved post
   preferences: { showMyApplications: false }
 };
 
@@ -22,6 +24,7 @@ export const MOCK_USER_STUDENT: User = {
   email: '119010001@link.cuhk.edu.cn',
   bio: 'Junior student passionate about NLP.',
   avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Jane',
+  savedPostIds: ['1', '3'], // Mock saved posts
   preferences: { showMyApplications: true }
 };
 

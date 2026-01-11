@@ -1,3 +1,4 @@
+
 export enum UserRole {
   GUEST = 'GUEST',
   STUDENT = 'STUDENT',
@@ -30,6 +31,7 @@ export interface User {
   email: string;
   bio?: string;
   avatarUrl: string;
+  savedPostIds?: string[]; // New field for saved positions
   preferences?: {
     showMyApplications?: boolean;
   };
