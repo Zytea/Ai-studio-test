@@ -28,17 +28,17 @@ const PostDetail: React.FC<PostDetailProps> = ({ post, currentUser, onBack, onAp
   const isOwner = currentUser?.id === post.professorId;
 
   return (
-    <div className="max-w-[85%] mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="max-w-[85%] mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-fade-in">
       
       {/* Back Nav */}
-      <button onClick={onBack} className="flex items-center text-gray-500 hover:text-indigo-600 mb-6 transition-colors">
-        <ArrowLeft size={18} className="mr-1" /> Back to Search
+      <button onClick={onBack} className="flex items-center text-gray-500 hover:text-indigo-600 mb-6 transition-colors group">
+        <ArrowLeft size={18} className="mr-1 group-hover:-translate-x-1 transition-transform" /> Back to Search
       </button>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         
         {/* Main Content */}
-        <div className="lg:col-span-2 space-y-6">
+        <div className="lg:col-span-2 space-y-6 animate-fade-in">
           
           {/* Header Card */}
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 sm:p-8">
@@ -108,7 +108,7 @@ const PostDetail: React.FC<PostDetailProps> = ({ post, currentUser, onBack, onAp
         </div>
 
         {/* Sidebar Actions */}
-        <div className="space-y-6">
+        <div className="space-y-6 animate-fade-in" style={{animationDelay: '100ms'}}>
           <div className="sticky top-24 space-y-4">
             
             <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
@@ -127,7 +127,7 @@ const PostDetail: React.FC<PostDetailProps> = ({ post, currentUser, onBack, onAp
                  {isOwner ? (
                     <button 
                         onClick={() => alert('Redirect to Dashboard Edit Mode')}
-                        className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-indigo-600 text-white rounded-lg font-bold hover:bg-indigo-700 transition-all shadow-sm"
+                        className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-indigo-600 text-white rounded-lg font-bold hover:bg-indigo-700 transition-all shadow-sm active:scale-95"
                     >
                         <Edit2 size={18} /> Edit Post
                     </button>
@@ -135,7 +135,7 @@ const PostDetail: React.FC<PostDetailProps> = ({ post, currentUser, onBack, onAp
                     <button 
                         onClick={() => currentUser ? setApplyModalOpen(true) : alert('Please login first')}
                         disabled={post.status === JobStatus.CLOSED}
-                        className={`w-full flex items-center justify-center gap-2 px-4 py-3 text-white rounded-lg font-bold transition-all shadow-sm hover:shadow-md ${post.status === JobStatus.CLOSED ? 'bg-gray-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-700'}`}
+                        className={`w-full flex items-center justify-center gap-2 px-4 py-3 text-white rounded-lg font-bold transition-all shadow-sm hover:shadow-md active:scale-95 ${post.status === JobStatus.CLOSED ? 'bg-gray-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-700'}`}
                     >
                         Apply Now
                     </button>
@@ -167,8 +167,8 @@ const PostDetail: React.FC<PostDetailProps> = ({ post, currentUser, onBack, onAp
       {/* Apply Modal */}
       {isApplyModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-           <div className="fixed inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setApplyModalOpen(false)}></div>
-           <div className="relative bg-white rounded-xl shadow-xl w-full max-w-lg p-6 overflow-hidden">
+           <div className="fixed inset-0 bg-black/50 backdrop-blur-sm animate-fade-in" onClick={() => setApplyModalOpen(false)}></div>
+           <div className="relative bg-white rounded-xl shadow-xl w-full max-w-lg p-6 overflow-hidden animate-scale-in">
              <h2 className="text-2xl font-bold text-gray-900 mb-2">Apply for Position</h2>
              <p className="text-gray-500 mb-6 text-sm">{post.title}</p>
              
@@ -197,7 +197,7 @@ const PostDetail: React.FC<PostDetailProps> = ({ post, currentUser, onBack, onAp
                     placeholder="https://..."
                     value={resumeLink}
                     onChange={(e) => setResumeLink(e.target.value)}
-                    className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none" 
+                    className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition-shadow" 
                    />
                 </div>
 
@@ -210,14 +210,14 @@ const PostDetail: React.FC<PostDetailProps> = ({ post, currentUser, onBack, onAp
                     value={statement}
                     onChange={(e) => setStatement(e.target.value)}
                     placeholder="Briefly explain your advantage or why you are applying..."
-                    className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none" 
+                    className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition-shadow" 
                    />
                    <p className="text-right text-xs text-gray-400 mt-1">{statement.length}/500</p>
                 </div>
 
                 <div className="flex gap-3 pt-2">
-                  <button type="button" onClick={() => setApplyModalOpen(false)} className="flex-1 py-2.5 bg-gray-100 text-gray-700 font-bold rounded-lg hover:bg-gray-200">Cancel</button>
-                  <button type="submit" className="flex-1 py-2.5 bg-indigo-600 text-white font-bold rounded-lg hover:bg-indigo-700">Submit Application</button>
+                  <button type="button" onClick={() => setApplyModalOpen(false)} className="flex-1 py-2.5 bg-gray-100 text-gray-700 font-bold rounded-lg hover:bg-gray-200 transition-colors">Cancel</button>
+                  <button type="submit" className="flex-1 py-2.5 bg-indigo-600 text-white font-bold rounded-lg hover:bg-indigo-700 transition-transform active:scale-95">Submit Application</button>
                 </div>
              </form>
            </div>

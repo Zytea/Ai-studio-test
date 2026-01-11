@@ -81,33 +81,33 @@ const Dashboard: React.FC<DashboardProps> = ({ user, userPosts, userApplications
   // 1. Post Editor (Mock)
   if (isEditingPost) {
     return (
-        <div className="max-w-4xl mx-auto px-4 py-8">
-            <button onClick={() => setIsEditingPost(false)} className="flex items-center text-gray-500 hover:text-indigo-600 mb-6">
+        <div className="max-w-4xl mx-auto px-4 py-8 animate-fade-in">
+            <button onClick={() => setIsEditingPost(false)} className="flex items-center text-gray-500 hover:text-indigo-600 mb-6 transition-colors">
                 <X size={18} className="mr-1" /> Cancel
             </button>
-            <h2 className="text-2xl font-bold mb-6">{editingPostData.id ? 'Edit Position' : 'Create New Position'}</h2>
-            <div className="bg-white p-8 rounded-xl border border-gray-200 shadow-sm space-y-6">
+            <h2 className="text-2xl font-bold mb-6 animate-fade-in">{editingPostData.id ? 'Edit Position' : 'Create New Position'}</h2>
+            <div className="bg-white p-8 rounded-xl border border-gray-200 shadow-sm space-y-6 animate-fade-in" style={{animationDelay: '100ms'}}>
                 {/* Reusing Form Styles roughly */}
                 <div className="grid grid-cols-2 gap-6">
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">Research Topic (Title)</label>
-                        <input type="text" className="w-full border border-gray-300 rounded p-2" defaultValue={editingPostData.title} />
+                        <input type="text" className="w-full border border-gray-300 rounded p-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition-shadow" defaultValue={editingPostData.title} />
                     </div>
                      <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">Department</label>
-                        <select className="w-full border border-gray-300 rounded p-2" defaultValue={editingPostData.school}>
+                        <select className="w-full border border-gray-300 rounded p-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition-shadow" defaultValue={editingPostData.school}>
                             <option>SDS</option><option>SSE</option><option>SME</option>
                         </select>
                     </div>
                 </div>
                 <div>
                      <label className="block text-sm font-medium text-gray-700 mb-1">Description (Markdown)</label>
-                     <textarea className="w-full border border-gray-300 rounded p-2" rows={5} defaultValue={editingPostData.description}></textarea>
+                     <textarea className="w-full border border-gray-300 rounded p-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition-shadow" rows={5} defaultValue={editingPostData.description}></textarea>
                 </div>
                  <div className="grid grid-cols-3 gap-6">
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
-                        <select className="w-full border border-gray-300 rounded p-2" defaultValue={editingPostData.status}>
+                        <select className="w-full border border-gray-300 rounded p-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition-shadow" defaultValue={editingPostData.status}>
                              <option value={JobStatus.OPEN}>Open</option>
                              <option value={JobStatus.COMPETITIVE}>Competitive</option>
                              <option value={JobStatus.CLOSED}>Closed</option>
@@ -115,15 +115,15 @@ const Dashboard: React.FC<DashboardProps> = ({ user, userPosts, userApplications
                     </div>
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">Headcount</label>
-                        <input type="number" className="w-full border border-gray-300 rounded p-2" defaultValue={editingPostData.headcount} />
+                        <input type="number" className="w-full border border-gray-300 rounded p-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition-shadow" defaultValue={editingPostData.headcount} />
                     </div>
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">Subsidy</label>
-                        <input type="text" className="w-full border border-gray-300 rounded p-2" defaultValue={editingPostData.subsidy} />
+                        <input type="text" className="w-full border border-gray-300 rounded p-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition-shadow" defaultValue={editingPostData.subsidy} />
                     </div>
                 </div>
                 <div className="pt-4 flex justify-end">
-                    <button onClick={() => { setIsEditingPost(false); alert('Post Updated (Simulated)'); }} className="bg-indigo-600 text-white px-6 py-2 rounded font-bold hover:bg-indigo-700">Save Position</button>
+                    <button onClick={() => { setIsEditingPost(false); alert('Post Updated (Simulated)'); }} className="bg-indigo-600 text-white px-6 py-2 rounded font-bold hover:bg-indigo-700 transition-transform active:scale-95">Save Position</button>
                 </div>
             </div>
         </div>
@@ -140,8 +140,8 @@ const Dashboard: React.FC<DashboardProps> = ({ user, userPosts, userApplications
     }
 
     return (
-      <div className="max-w-[90%] mx-auto px-4 py-8">
-        <button onClick={() => setManagingPostId(null)} className="flex items-center text-gray-500 hover:text-indigo-600 mb-6">
+      <div className="max-w-[90%] mx-auto px-4 py-8 animate-fade-in">
+        <button onClick={() => setManagingPostId(null)} className="flex items-center text-gray-500 hover:text-indigo-600 mb-6 transition-colors">
           <X size={18} className="mr-1" /> Back to Dashboard
         </button>
         
@@ -162,7 +162,7 @@ const Dashboard: React.FC<DashboardProps> = ({ user, userPosts, userApplications
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden animate-fade-in">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
@@ -185,7 +185,7 @@ const Dashboard: React.FC<DashboardProps> = ({ user, userPosts, userApplications
                     <p className="text-sm text-gray-500 line-clamp-2 max-w-xs" title={app.statement}>{app.statement}</p>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                     <a href={app.resumeLink} target="_blank" rel="noreferrer" className="text-indigo-600 hover:text-indigo-900 flex items-center gap-1 text-sm font-medium">
+                     <a href={app.resumeLink} target="_blank" rel="noreferrer" className="text-indigo-600 hover:text-indigo-900 flex items-center gap-1 text-sm font-medium transition-colors">
                        Open Link <ExternalLink size={14} />
                      </a>
                   </td>
@@ -193,7 +193,7 @@ const Dashboard: React.FC<DashboardProps> = ({ user, userPosts, userApplications
                     <select 
                       value={app.status} 
                       onChange={(e) => handleStatusChange(app.id, e.target.value as ApplicationStatus)}
-                      className={`block w-full pl-3 pr-8 py-1.5 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md bg-gray-50 font-medium ${app.status === ApplicationStatus.REJECTED ? 'text-red-700' : 'text-gray-900'}`}
+                      className={`block w-full pl-3 pr-8 py-1.5 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md bg-gray-50 font-medium ${app.status === ApplicationStatus.REJECTED ? 'text-red-700' : 'text-gray-900'} transition-colors`}
                     >
                       {Object.values(ApplicationStatus).map(s => (
                         <option key={s} value={s}>{s}</option>
@@ -217,22 +217,22 @@ const Dashboard: React.FC<DashboardProps> = ({ user, userPosts, userApplications
         {/* Rejection Reason Modal */}
         {rejectingAppId && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-            <div className="fixed inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setRejectingAppId(null)}></div>
-            <div className="relative bg-white rounded-lg shadow-xl w-full max-w-md p-6">
+            <div className="fixed inset-0 bg-black/50 backdrop-blur-sm animate-fade-in" onClick={() => setRejectingAppId(null)}></div>
+            <div className="relative bg-white rounded-lg shadow-xl w-full max-w-md p-6 animate-scale-in">
               <h3 className="text-lg font-bold text-gray-900 mb-4">Reason for Rejection</h3>
               <textarea
-                className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-indigo-500 mb-4"
+                className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-indigo-500 mb-4 focus:outline-none"
                 rows={3}
                 placeholder="Required..."
                 value={rejectionReason}
                 onChange={(e) => setRejectionReason(e.target.value)}
               />
               <div className="flex justify-end gap-2">
-                <button onClick={() => setRejectingAppId(null)} className="px-4 py-2 text-gray-600 font-medium">Cancel</button>
+                <button onClick={() => setRejectingAppId(null)} className="px-4 py-2 text-gray-600 font-medium hover:bg-gray-100 rounded transition-colors">Cancel</button>
                 <button 
                   onClick={confirmRejection} 
                   disabled={!rejectionReason.trim()}
-                  className="px-4 py-2 bg-red-600 text-white rounded font-medium disabled:opacity-50"
+                  className="px-4 py-2 bg-red-600 text-white rounded font-medium disabled:opacity-50 hover:bg-red-700 transition-colors"
                 >
                   Confirm Reject
                 </button>
@@ -246,9 +246,9 @@ const Dashboard: React.FC<DashboardProps> = ({ user, userPosts, userApplications
 
   // Initial Views
   return (
-    <div className="max-w-[90%] mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="max-w-[90%] mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-fade-in">
       {/* Profile Header */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8 mb-8 flex flex-col md:flex-row items-center md:items-start gap-6">
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8 mb-8 flex flex-col md:flex-row items-center md:items-start gap-6 animate-fade-in">
         <img 
           src={user.avatarUrl} 
           alt={user.name} 
@@ -277,8 +277,8 @@ const Dashboard: React.FC<DashboardProps> = ({ user, userPosts, userApplications
           {user.role === UserRole.PROFESSOR && (
             <button 
               onClick={() => setActiveTab('posts')}
-              className={`w-full flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-lg transition-colors ${
-                activeTab === 'posts' ? 'bg-indigo-50 text-indigo-700' : 'text-gray-600 hover:bg-gray-50'
+              className={`w-full flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 ${
+                activeTab === 'posts' ? 'bg-indigo-50 text-indigo-700 shadow-sm' : 'text-gray-600 hover:bg-gray-50'
               }`}
             >
               <FileText size={18} /> My Posts
@@ -288,8 +288,8 @@ const Dashboard: React.FC<DashboardProps> = ({ user, userPosts, userApplications
           {(user.role === UserRole.STUDENT || showMyApplicationsTab) && (
               <button 
                 onClick={() => setActiveTab('applications')}
-                className={`w-full flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-lg transition-colors ${
-                  activeTab === 'applications' ? 'bg-indigo-50 text-indigo-700' : 'text-gray-600 hover:bg-gray-50'
+                className={`w-full flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 ${
+                  activeTab === 'applications' ? 'bg-indigo-50 text-indigo-700 shadow-sm' : 'text-gray-600 hover:bg-gray-50'
                 }`}
               >
                 <Bookmark size={18} /> {user.role === UserRole.PROFESSOR ? 'My Applications' : 'My Applications'}
@@ -298,8 +298,8 @@ const Dashboard: React.FC<DashboardProps> = ({ user, userPosts, userApplications
 
           <button 
             onClick={() => setActiveTab('settings')}
-            className={`w-full flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-lg transition-colors ${
-              activeTab === 'settings' ? 'bg-indigo-50 text-indigo-700' : 'text-gray-600 hover:bg-gray-50'
+            className={`w-full flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 ${
+              activeTab === 'settings' ? 'bg-indigo-50 text-indigo-700 shadow-sm' : 'text-gray-600 hover:bg-gray-50'
             }`}
           >
             <Settings size={18} /> Settings
@@ -311,26 +311,30 @@ const Dashboard: React.FC<DashboardProps> = ({ user, userPosts, userApplications
           
           {/* PROFESSOR: MY POSTS */}
           {activeTab === 'posts' && user.role === UserRole.PROFESSOR && (
-             <div className="space-y-6">
+             <div className="space-y-6 animate-fade-in">
                 <div className="flex justify-between items-center">
                   <h2 className="text-xl font-bold">My Posted Positions</h2>
                   <button 
                     onClick={() => { setEditingPostData({}); setIsEditingPost(true); }}
-                    className="px-4 py-2 bg-indigo-600 text-white rounded-md text-sm font-bold hover:bg-indigo-700"
+                    className="px-4 py-2 bg-indigo-600 text-white rounded-md text-sm font-bold hover:bg-indigo-700 transition-transform active:scale-95"
                   >
                     Create New Post
                   </button>
                 </div>
                 {sortedUserPosts.length > 0 ? (
                   <div className="space-y-4">
-                    {sortedUserPosts.map(post => {
+                    {sortedUserPosts.map((post, index) => {
                        const count = localApps.filter(a => a.postId === post.id).length;
                        return (
-                        <div key={post.id} className="bg-white border border-gray-200 rounded-lg p-5 flex flex-col md:flex-row gap-4 hover:shadow-md transition-shadow">
+                        <div 
+                          key={post.id} 
+                          className="bg-white border border-gray-200 rounded-lg p-5 flex flex-col md:flex-row gap-4 hover:shadow-md transition-shadow animate-fade-in"
+                          style={{ animationDelay: `${index * 50}ms` }}
+                        >
                            <div className="flex-1 space-y-2">
                              <div className="flex justify-between items-start">
                                  <h3 
-                                    className="text-lg font-bold text-gray-900 cursor-pointer hover:text-indigo-600"
+                                    className="text-lg font-bold text-gray-900 cursor-pointer hover:text-indigo-600 transition-colors"
                                     onClick={() => onPostClick(post.id)} // Go to detail
                                  >
                                     {post.title}
@@ -362,19 +366,19 @@ const Dashboard: React.FC<DashboardProps> = ({ user, userPosts, userApplications
                            <div className="flex flex-row md:flex-col gap-2 justify-center border-t md:border-t-0 md:border-l border-gray-100 pt-4 md:pt-0 md:pl-4 min-w-[160px]">
                               <button 
                                 onClick={() => { setEditingPostData(post); setIsEditingPost(true); }}
-                                className="flex-1 px-3 py-1.5 text-sm bg-white border border-gray-300 text-gray-700 rounded hover:bg-gray-50 flex items-center justify-center gap-2"
+                                className="flex-1 px-3 py-1.5 text-sm bg-white border border-gray-300 text-gray-700 rounded hover:bg-gray-50 flex items-center justify-center gap-2 transition-colors"
                               >
                                 <Edit2 size={14} /> Edit
                               </button>
                               <button 
                                 onClick={() => alert('Close/Delete simulated')}
-                                className="flex-1 px-3 py-1.5 text-sm bg-white border border-gray-300 text-gray-700 rounded hover:bg-red-50 hover:text-red-600 hover:border-red-200 flex items-center justify-center gap-2"
+                                className="flex-1 px-3 py-1.5 text-sm bg-white border border-gray-300 text-gray-700 rounded hover:bg-red-50 hover:text-red-600 hover:border-red-200 flex items-center justify-center gap-2 transition-colors"
                               >
                                 <Trash2 size={14} /> Close
                               </button>
                               <button 
                                 onClick={() => setManagingPostId(post.id)}
-                                className="flex-1 px-3 py-1.5 text-sm bg-indigo-50 text-indigo-700 border border-indigo-100 rounded font-bold hover:bg-indigo-100 flex items-center justify-center gap-2"
+                                className="flex-1 px-3 py-1.5 text-sm bg-indigo-50 text-indigo-700 border border-indigo-100 rounded font-bold hover:bg-indigo-100 flex items-center justify-center gap-2 transition-colors"
                               >
                                 View Applications
                               </button>
@@ -384,7 +388,7 @@ const Dashboard: React.FC<DashboardProps> = ({ user, userPosts, userApplications
                     })}
                   </div>
                 ) : (
-                  <div className="text-center py-12 bg-gray-50 rounded-lg border-2 border-dashed border-gray-200">
+                  <div className="text-center py-12 bg-gray-50 rounded-lg border-2 border-dashed border-gray-200 animate-fade-in">
                     <p className="text-gray-500">You haven't posted any positions yet.</p>
                   </div>
                 )}
@@ -393,21 +397,22 @@ const Dashboard: React.FC<DashboardProps> = ({ user, userPosts, userApplications
 
           {/* MY APPLICATIONS */}
           {activeTab === 'applications' && (
-             <div className="space-y-6">
+             <div className="space-y-6 animate-fade-in">
                 <h2 className="text-xl font-bold">My Applications</h2>
                 {userApplications.length > 0 ? (
                   <div className="space-y-4">
-                    {userApplications.map(app => {
+                    {userApplications.map((app, index) => {
                       const post = userPosts.find(p => p.id === app.postId); // Note: In real app, need access to all posts or fetch
                       // Assuming userPosts passed here contains relevant posts, otherwise fallback
                       return (
                         <div 
                             key={app.id} 
                             onClick={() => onPostClick(app.postId)}
-                            className="bg-white border border-gray-200 rounded-lg p-5 cursor-pointer hover:border-indigo-300 hover:shadow-sm transition-all"
+                            className="bg-white border border-gray-200 rounded-lg p-5 cursor-pointer hover:border-indigo-300 hover:shadow-md transition-all animate-fade-in"
+                            style={{ animationDelay: `${index * 50}ms` }}
                         >
                            <div className="flex justify-between items-start mb-2">
-                             <h3 className="text-lg font-bold text-gray-900 group-hover:text-indigo-600">
+                             <h3 className="text-lg font-bold text-gray-900 group-hover:text-indigo-600 transition-colors">
                                  {/* Mock title lookup if not in userPosts */}
                                  {post?.title || `Position #${app.postId}`} 
                              </h3>
@@ -427,7 +432,7 @@ const Dashboard: React.FC<DashboardProps> = ({ user, userPosts, userApplications
                     })}
                   </div>
                 ) : (
-                  <div className="text-center py-12 bg-gray-50 rounded-lg border-2 border-dashed border-gray-200">
+                  <div className="text-center py-12 bg-gray-50 rounded-lg border-2 border-dashed border-gray-200 animate-fade-in">
                     <p className="text-gray-500">No applications yet.</p>
                   </div>
                 )}
@@ -436,9 +441,9 @@ const Dashboard: React.FC<DashboardProps> = ({ user, userPosts, userApplications
           
           {/* SETTINGS */}
           {activeTab === 'settings' && (
-            <div className="max-w-xl">
+            <div className="max-w-xl animate-fade-in">
               <h2 className="text-xl font-bold mb-6">Account Settings</h2>
-              <div className="bg-white p-6 rounded-lg border border-gray-200 space-y-6">
+              <div className="bg-white p-6 rounded-lg border border-gray-200 space-y-6 animate-fade-in">
                 <div className="grid grid-cols-2 gap-4">
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
@@ -452,12 +457,12 @@ const Dashboard: React.FC<DashboardProps> = ({ user, userPosts, userApplications
                 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Grade / Position</label>
-                  <input type="text" defaultValue={user.position} className="w-full p-2 border border-gray-300 rounded-md" placeholder="e.g. Junior, Assistant Professor"/>
+                  <input type="text" defaultValue={user.position} className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:outline-none transition-shadow" placeholder="e.g. Junior, Assistant Professor"/>
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Bio</label>
-                  <textarea className="w-full p-2 border border-gray-300 rounded-md" rows={4} defaultValue={user.bio}></textarea>
+                  <textarea className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:outline-none transition-shadow" rows={4} defaultValue={user.bio}></textarea>
                 </div>
 
                 {user.role === UserRole.PROFESSOR && (
@@ -466,7 +471,7 @@ const Dashboard: React.FC<DashboardProps> = ({ user, userPosts, userApplications
                             type="checkbox" 
                             checked={showMyApplicationsTab} 
                             onChange={(e) => setShowMyApplicationsTab(e.target.checked)}
-                            className="rounded text-indigo-600"
+                            className="rounded text-indigo-600 focus:ring-indigo-500"
                         />
                         <span className="text-sm text-gray-700">Show "My Applications" Tab</span>
                     </div>
@@ -475,14 +480,14 @@ const Dashboard: React.FC<DashboardProps> = ({ user, userPosts, userApplications
                 <div>
                     <h3 className="text-sm font-bold text-gray-900 mb-3">Change Password</h3>
                     <div className="space-y-3">
-                        <input type="password" placeholder="New Password" className="w-full p-2 border border-gray-300 rounded-md" />
-                        <input type="password" placeholder="Confirm New Password" className="w-full p-2 border border-gray-300 rounded-md" />
+                        <input type="password" placeholder="New Password" className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:outline-none transition-shadow" />
+                        <input type="password" placeholder="Confirm New Password" className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:outline-none transition-shadow" />
                     </div>
                 </div>
 
                 <div className="pt-2 flex flex-col gap-3">
-                    <button className="w-full px-4 py-2 bg-indigo-600 text-white rounded-md font-medium hover:bg-indigo-700">Save Changes</button>
-                    <button className="w-full px-4 py-2 bg-white text-red-600 border border-red-200 rounded-md font-medium hover:bg-red-50">Delete Account</button>
+                    <button className="w-full px-4 py-2 bg-indigo-600 text-white rounded-md font-medium hover:bg-indigo-700 transition-transform active:scale-95">Save Changes</button>
+                    <button className="w-full px-4 py-2 bg-white text-red-600 border border-red-200 rounded-md font-medium hover:bg-red-50 transition-colors">Delete Account</button>
                 </div>
               </div>
             </div>

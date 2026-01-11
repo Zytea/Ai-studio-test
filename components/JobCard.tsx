@@ -46,10 +46,10 @@ const JobCard: React.FC<JobCardProps> = ({ post, onClick }) => {
   return (
     <div 
       onClick={() => onClick(post.id)}
-      className="group bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer overflow-hidden flex flex-col h-full"
+      className="group bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-xl transition-all duration-300 cursor-pointer overflow-hidden flex flex-col h-full transform hover:-translate-y-1"
     >
       {/* Color-Coded Header */}
-      <div className={`px-4 py-2 flex items-center justify-between border-b ${statusConfig.bg} border-gray-100`}>
+      <div className={`px-4 py-2 flex items-center justify-between border-b ${statusConfig.bg} border-gray-100 transition-colors`}>
         <div className="flex items-center gap-2">
             <div className={`w-2 h-2 rounded-full ${statusConfig.bar}`}></div>
             <span className={`text-xs font-bold uppercase tracking-wider ${statusConfig.text}`}>
@@ -89,12 +89,12 @@ const JobCard: React.FC<JobCardProps> = ({ post, onClick }) => {
         {/* Footer Info */}
         <div className="mt-auto pt-4 border-t border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-sm text-gray-500">
             <div className="flex items-center gap-1.5">
-                <User size={14} className="text-gray-400" />
-                <span className="truncate max-w-[120px]">{post.professorName}</span>
+                <User size={14} className="text-gray-400 group-hover:text-indigo-500 transition-colors" />
+                <span className="truncate max-w-[120px] group-hover:text-gray-700 transition-colors">{post.professorName}</span>
             </div>
             <div className="flex items-center gap-1.5">
-                <Building2 size={14} className="text-gray-400" />
-                <span className="truncate max-w-[100px]">{post.school}</span>
+                <Building2 size={14} className="text-gray-400 group-hover:text-indigo-500 transition-colors" />
+                <span className="truncate max-w-[100px] group-hover:text-gray-700 transition-colors">{post.school}</span>
             </div>
         </div>
       </div>
